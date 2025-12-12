@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo App</title>
+</head>
+<body>
+  <h2>Create a To-Do Item</h2>
+
+  <form id="todoForm">
+    <input type="text" id="itemName" placeholder="Item Name" required /><br><br>
+    <textarea id="itemDescription" placeholder="Item Description"></textarea><br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <h3>Your To-Dos</h3>
+  <div id="todoList"></div>
+
+  <script>
+    // Submit form
+    document.getElementById("todoForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const itemName = document.getElementById("itemName").value;
+      const itemDescription = document.getElementById("itemDescription").value;
+
+      const res = await fetch("http://localhost:8080/submittodoitem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemName, itemDescription })
+      });
+
+      const result = await res.json();
+      alert(result.message);
+      loadTodos(); // refresh list
+    });
+
+    // Fetch all todos
+    async function loadTodos() {
+      const res = await fetch("http://localhost:8080/api");
+      const data = await res.json();
+
+      document.getElementById("todoList").innerHTML =
+        data.map(todo => `<p><b>${todo.name}</b>: ${todo.desc}</p>`).join("");
+    }
+
+    // Load todos on page load
+    loadTodos();
+  </script>
+</body>
+</html>
